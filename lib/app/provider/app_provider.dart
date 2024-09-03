@@ -19,7 +19,9 @@ class AppProviders extends StatelessWidget {
       providers: [
         BlocProvider(
           create: (_) => di.gI<NoteBloc>()
-            ..add(const LoadNotes(drawerSectionView: DrawerSectionView.home)),
+            ..add(const LoadNotes(
+              drawerSectionView: DrawerSectionView.home,
+            )),
         ),
         BlocProvider(create: (_) => di.gI<StatusGridCubit>()),
         BlocProvider(create: (_) => di.gI<StatusIconsCubit>()),
