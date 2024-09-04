@@ -10,7 +10,7 @@ import 'package:note_app/features/domain/usecases/detele_note.dart';
 import 'package:note_app/features/domain/usecases/get_note_by_id.dart';
 import 'package:note_app/features/domain/usecases/get_notes.dart';
 import 'package:note_app/features/domain/usecases/update_note.dart';
-import 'package:note_app/features/presentation/blocs/note/note_bloc.dart';
+import 'package:note_app/features/presentation/blocs/blocs.dart';
 
 import 'note_bloc_test.mocks.dart';
 
@@ -80,6 +80,105 @@ void main() {
       expect: () => [
         // LoadingState(DrawerSelect.drawerSection), // You might not need this state if you're not showing a loading indicator
         ErrorState(DATABASE_FAILURE_MSG, DrawerSelect.drawerSection),
+      ],
+    );
+  });
+  group('UpdateNote', () {
+    final tNote = Note(
+      id: '1',
+      title: 'Updated Test Note',
+      content: 'This is an updated test note',
+      colorIndex: 1,
+      stateNote: StatusNote.undefined,
+      modifiedTime: DateTime.now(),
+    );
+
+    blocTest<NoteBloc, NoteState>(
+      'emits [LoadingState, SuccessState] when note is updated successfully',
+      build: () {
+        when(mockUpdateNoteUsecase(any))
+            .thenAnswer((_) async => const Right(unit));
+        return bloc;
+      },
+      act: (bloc) => bloc.add(UpdateNote(tNote)),
+      expect: () => [
+        const SuccessState(UPDATE_SUCCESS_MSG),
+      ],
+    );
+
+    blocTest<NoteBloc, NoteState>(
+      'emits [LoadingState, ErrorState] when updating note fails',
+      build: () {
+        when(mockUpdateNoteUsecase(any))
+            .thenAnswer((_) async => Left(DatabaseFailure()));
+        return bloc;
+      },
+      act: (bloc) => bloc.add(UpdateNote(tNote)),
+      expect: () => [
+        ErrorState(DATABASE_FAILURE_MSG, DrawerSelect.drawerSection),
+      ],
+    );
+  });
+  group('DeleteNote', () {
+    const tNoteId = '1';
+
+    blocTest<NoteBloc, NoteState>(
+      'emits [LoadingState, SuccessState, GoPopNoteState] when note is deleted successfully',
+      build: () {
+        when(mockDeleteNoteUsecase(any))
+            .thenAnswer((_) async => const Right(unit));
+        return bloc;
+      },
+      act: (bloc) => bloc.add(const DeleteNote(tNoteId)),
+      expect: () => [
+        const SuccessState(DELETE_SUCCESS_MSG),
+        GoPopNoteState(),
+      ],
+    );
+
+    blocTest<NoteBloc, NoteState>(
+      'emits [LoadingState, ErrorState] when deleting note fails',
+      build: () {
+        when(mockDeleteNoteUsecase(any))
+            .thenAnswer((_) async => Left(DatabaseFailure()));
+        return bloc;
+      },
+      act: (bloc) => bloc.add(const DeleteNote(tNoteId)),
+      expect: () => [
+        ErrorState(DATABASE_FAILURE_MSG, DrawerSelect.drawerSection),
+        GoPopNoteState(),
+      ],
+    );
+  });
+
+  group('DeleteNote', () {
+    const tNoteId = '1';
+
+    blocTest<NoteBloc, NoteState>(
+      'emits [LoadingState, SuccessState, GoPopNoteState] when note is deleted successfully',
+      build: () {
+        when(mockDeleteNoteUsecase(any))
+            .thenAnswer((_) async => const Right(unit));
+        return bloc;
+      },
+      act: (bloc) => bloc.add(const DeleteNote(tNoteId)),
+      expect: () => [
+        const SuccessState(DELETE_SUCCESS_MSG),
+        GoPopNoteState(),
+      ],
+    );
+
+    blocTest<NoteBloc, NoteState>(
+      'emits [LoadingState, ErrorState] when deleting note fails',
+      build: () {
+        when(mockDeleteNoteUsecase(any))
+            .thenAnswer((_) async => Left(DatabaseFailure()));
+        return bloc;
+      },
+      act: (bloc) => bloc.add(const DeleteNote(tNoteId)),
+      expect: () => [
+        ErrorState(DATABASE_FAILURE_MSG, DrawerSelect.drawerSection),
+        GoPopNoteState(),
       ],
     );
   });
